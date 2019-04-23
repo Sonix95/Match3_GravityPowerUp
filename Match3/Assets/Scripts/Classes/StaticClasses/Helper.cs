@@ -30,8 +30,8 @@ namespace Match3Project.Classes.StaticClasses
 
             switch (powerTypeString)
             {
-                case StringsAndConst.TAG_BOMB:
-                    powerUpType = PowerUpTypes.Bomb;
+                case StringsAndConst.TAG_GRAVITY:
+                    powerUpType = PowerUpTypes.Gravity;
                     break;
             }
 
@@ -51,7 +51,7 @@ namespace Match3Project.Classes.StaticClasses
             PowerUpTypes powerUp = PowerUpTypes.None;
 
             if (matchCount >= 4)
-                powerUp = PowerUpTypes.Bomb;
+                powerUp = PowerUpTypes.Gravity;
 
             return powerUp;
         }

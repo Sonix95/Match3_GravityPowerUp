@@ -23,7 +23,7 @@ namespace Match3Project.Classes
                 _normalCellsPrefabsList.Add(objTempArray[i] as GameObject);
             }
 
-            _powersPrefabs.Add(PowerUpTypes.Bomb, Resources.Load(StringsAndConst.POWER_BOMB) as GameObject);
+            _powersPrefabs.Add(PowerUpTypes.Gravity, Resources.Load(StringsAndConst.POWER_GRAVITY) as GameObject);
         }
 
         public GameObject GetRandomGameElement()

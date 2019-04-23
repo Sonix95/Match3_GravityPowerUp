@@ -10,82 +10,12 @@ namespace Match3Project.Classes
     public class CheckManager : ICheckManager
     {
         private IBoard _board;
-
-        public bool SimpleCheck(ICell cell)
-        {
-            int x = cell.TargetX;
-            int y = cell.TargetY;
-
-            if (y > 1 && x > 1)
-            {
-                if (!Helper.CellIsEmpty(_board.Cells[x, y - 1]) &&
-                    !Helper.CellIsEmpty(_board.Cells[x, y - 2]) &&
-                    !Helper.CellIsEmpty(_board.Cells[x - 1, y]) &&
-                    !Helper.CellIsEmpty(_board.Cells[x - 2, y]))
-                {
-                    ICell[] sideCells =
-                    {
-                        _board.Cells[x, y - 1],
-                        _board.Cells[x, y - 2],
-                        _board.Cells[x - 1, y],
-                        _board.Cells[x - 2, y]
-                    };
-
-                    foreach (var sideCell in sideCells)
-                    {
-                        if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
-                            return true;
-                    }
-                }
-            }
-            else if (y <= 1 || x <= 1)
-            {
-                if (y > 1)
-                {
-                    if (!Helper.CellIsEmpty(_board.Cells[x, y - 1]) &&
-                        !Helper.CellIsEmpty(_board.Cells[x, y - 2]))
-                    {
-                        ICell[] sideHorizontalCells =
-                        {
-                            _board.Cells[x, y - 1],
-                            _board.Cells[x, y - 2]
-                        };
-
-                        foreach (var sideCell in sideHorizontalCells)
-                        {
-                            if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
-                                return true;
-                        }
-                    }
-                }
-
-                if (x > 1)
-                {
-                    if (!Helper.CellIsEmpty(_board.Cells[x - 1, y]) &&
-                        !Helper.CellIsEmpty(_board.Cells[x - 2, y]))
-                    {
-                        ICell[] sideVerticalCells =
-                        {
-                            _board.Cells[x - 1, y],
-                            _board.Cells[x - 2, y]
-                        };
-
-                        foreach (var sideCell in sideVerticalCells)
-                        {
-                            if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
-                                return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
         private IList<ICell> CheckLine(AxisTypes axisType, ICell cell)
         {
             if (Helper.CellIsEmpty(cell))
+            {
                 return null;
+            }
 
             IList<ICell> sideCells = new List<ICell>();
 
@@ -118,11 +48,18 @@ namespace Match3Project.Classes
 
                     if (Helper.CellIsEmpty(sideCell) ||
                         sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                    {
                         break;
+                    }
+
                     if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
+                    {
                         sideCells.Add(sideCell);
+                    }
                     else
+                    {
                         break;
+                    }
                 }
             }
 
@@ -136,11 +73,18 @@ namespace Match3Project.Classes
 
                     if (Helper.CellIsEmpty(sideCell) ||
                         sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                    {
                         break;
+                    }
+
                     if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
+                    {
                         sideCells.Add(sideCell);
+                    }
                     else
+                    {
                         break;
+                    }
                 }
             }
 
@@ -153,7 +97,9 @@ namespace Match3Project.Classes
             IList<ICell> verticalCellsList = CheckLine(AxisTypes.Vertical, cell);
 
             if (horizontalCellsList.Count > 1 || verticalCellsList.Count > 1)
+            {
                 return true;
+            }
 
             return false;
         }
@@ -166,26 +112,46 @@ namespace Match3Project.Classes
             IList<ICell> verticalCellsList = CheckLine(AxisTypes.Vertical, cell);
 
             if (horizontalCellsList.Count > 1)
+            {
                 foreach (var horCell in horizontalCellsList)
+                {
                     allCellList.Add(horCell);
+                }
+            }
 
             if (verticalCellsList.Count > 1)
+            {
                 foreach (var vertCell in verticalCellsList)
+                {
                     allCellList.Add(vertCell);
+                }
+            }
 
             if (allCellList.Count > 0)
+            {
                 allCellList.Add(cell);
+            }
 
             if (horizontalCellsList.Count > verticalCellsList.Count)
+            {
                 majorAxis = AxisTypes.Horizontal;
+            }
             else if (horizontalCellsList.Count < verticalCellsList.Count)
+            {
                 majorAxis = AxisTypes.Vertical;
+            }
             else
+            {
                 majorAxis = AxisTypes.Undefined;
+            }
 
             foreach (var oneCell in allCellList)
+            {
                 if (oneCell.CellState != CellStates.Lock)
+                {
                     oneCell.CellState = CellStates.Check;
+                }
+            }
 
             return allCellList;
         }
@@ -201,8 +167,8 @@ namespace Match3Project.Classes
 
             switch (powerUpType)
             {
-                case PowerUpTypes.Bomb:
-                    checkedCells = BombPower(posX, posY);
+                case PowerUpTypes.Gravity:
+                    checkedCells = GravityPower(posX, posY);
                     break;
 
                 default:
@@ -213,7 +179,7 @@ namespace Match3Project.Classes
             return checkedCells;
         }
 
-        private IList<ICell> BombPower(int posX, int posY)
+        private IList<ICell> GravityPower(int posX, int posY)
         {
             IList<ICell> checkedCells = new List<ICell>();
 
@@ -223,13 +189,21 @@ namespace Match3Project.Classes
                 int y = Mathf.Abs(cell.TargetY - posY);
 
                 if (x < 3 && x > 0 && y < 2)
+                {
                     checkedCells.Add(cell);
+                }
                 else if (y < 3 && y > 0 && x < 2)
+                {
                     checkedCells.Add(cell);
+                }
                 else if (x == 1 && y == 1 || x == 1 && y == 0 || x == 0 && y == 1)
+                {
                     checkedCells.Add(cell);
+                }
                 else if (x == 0 && y == 0)
+                {
                     checkedCells.Add(cell);
+                }
             }
 
             return checkedCells;

@@ -18,9 +18,9 @@ namespace Match3Project.Classes.StaticClasses
         public const string NORMAL_CELL = "This cell is NORMAL: ";
 
         public const string GAMEPLAY_ELEMENTS = "Prefabs/Gameplay/Elements";
-        public const string POWER_BOMB = "Prefabs/Gameplay/Powers/Bomb";
+        public const string POWER_GRAVITY = "Prefabs/Gameplay/Powers/Gravity";
 
         public const string TAG_POWER = "Power";
-        public const string TAG_BOMB = "Bomb";
+        public const string TAG_GRAVITY = "Gravity";
     }
 }

@@ -4,6 +4,6 @@ namespace Match3Project.Enums
     {
         None,
         
-        Bomb,
+        Gravity,
     }
 }

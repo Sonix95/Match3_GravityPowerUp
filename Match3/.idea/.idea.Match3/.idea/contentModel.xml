@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\User\.Rider2018.3\system\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\User\.Rider2018.3\system\resharper-host\local\Transient\ReSharperHost\v183\SolutionCaches\_Match3.-852945083.00" t="ExcludeRecursive" />
+    <e p="E:\Documents\2019\Unity\Match3_GravityPowerUp\Match3" t="IncludeRecursive">
+      <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
+      <e p="Assets" t="Include">
+        <e p="Scripts" t="Include">
+          <e p="Classes" t="Include">
+            <e p="Board.cs" t="Include" />
+            <e p="Cells" t="Include">
+              <e p="NormalCell.cs" t="Include" />
+            </e>
+            <e p="CheckManager.cs" t="Include" />
+            <e p="Commands" t="Include">
+              <e p="FallCommand.cs" t="Include" />
+              <e p="MacroCommand.cs" t="Include" />
+              <e p="SwipeDownCommand.cs" t="Include" />
+              <e p="SwipeLeftCommand.cs" t="Include" />
+              <e p="SwipeRightCommand.cs" t="Include" />
+              <e p="SwipeUpCommand.cs" t="Include" />
+            </e>
+            <e p="InputManager.cs" t="Include" />
+            <e p="LogicManager.cs" t="Include" />
+            <e p="ObjectSetter.cs" t="Include" />
+            <e p="ObjectStorage.cs" t="Include" />
+            <e p="Observer" t="Include">
+              <e p="Notifier.cs" t="Include" />
+            </e>
+            <e p="SpawnManager.cs" t="Include" />
+            <e p="StaticClasses" t="Include">
+              <e p="Helper.cs" t="Include" />
+              <e p="StringsAndConst.cs" t="Include" />
+            </e>
+            <e p="UpdateManager.cs" t="Include" />
+          </e>
+          <e p="Enums" t="Include">
+            <e p="AxisTypes.cs" t="Include" />
+            <e p="CellStates.cs" t="Include" />
+            <e p="EventTypes.cs" t="Include" />
+            <e p="GameStates.cs" t="Include" />
+            <e p="MoveDirectionTypes.cs" t="Include" />
+            <e p="PowerUpTypes.cs" t="Include" />
+          </e>
+          <e p="Interfaces" t="Include">
+            <e p="Cells" t="Include">
+              <e p="ICell.cs" t="Include" />
+              <e p="INormalCell.cs" t="Include" />
+            </e>
+            <e p="Command" t="Include">
+              <e p="ICommand.cs" t="Include" />
+            </e>
+            <e p="IBoard.cs" t="Include" />
+            <e p="ICheckManager.cs" t="Include" />
+            <e p="IInputManager.cs" t="Include" />
+            <e p="ILogicManager.cs" t="Include" />
+            <e p="IObjectSetter.cs" t="Include" />
+            <e p="IObjectStorage.cs" t="Include" />
+            <e p="ISpawnManager.cs" t="Include" />
+            <e p="IUpdatable.cs" t="Include" />
+            <e p="IUpdateManager.cs" t="Include" />
+            <e p="Observer" t="Include">
+              <e p="INotifier.cs" t="Include" />
+              <e p="ISubscriber.cs" t="Include" />
+            </e>
+          </e>
+          <e p="Main" t="Include">
+            <e p="InitialManager.cs" t="Include" />
+          </e>
+        </e>
+      </e>
+      <e p="Library" t="ExcludeRecursive" />
+      <e p="Match3.sln" t="IncludeFlat" />
+      <e p="obj" t="ExcludeRecursive" />
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Temp" t="ExcludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+      </e>
+    </e>
+  </component>
+</project>
