@@ -23,7 +23,15 @@ namespace Match3Project.Classes.StaticClasses
             
             return moveDirection;
         }
+        
+        public static bool CellIsEmpty(ICell cell)
+        {
+            if (cell == null || cell.CurrentGameObject == null)
+                return true;
 
+            return false;
+        }
+        
         public static PowerUpTypes StringToPowerType(string powerTypeString)
         {
             PowerUpTypes powerUpType = PowerUpTypes.None;
@@ -38,14 +46,6 @@ namespace Match3Project.Classes.StaticClasses
             return powerUpType;
         }
         
-        public static bool CellIsEmpty(ICell cell)
-        {
-            if (cell == null || cell.CurrentGameObject == null)
-                return true;
-
-            return false;
-        }
-        
         public static PowerUpTypes DetectPowerUp(int matchCount, AxisTypes axis)
         {
             PowerUpTypes powerUp = PowerUpTypes.None;
@@ -54,6 +54,17 @@ namespace Match3Project.Classes.StaticClasses
                 powerUp = PowerUpTypes.Gravity;
 
             return powerUp;
+        }
+        
+        public static void SetGravityPowerUpColor(GameObject go, Color color)
+        {
+            GameObject powerGameObject = go.transform.GetChild(0).transform.gameObject;
+            
+            if (powerGameObject.CompareTag("Gravity"))
+            {
+                SpriteRenderer render = powerGameObject.GetComponent<SpriteRenderer>();
+                render.color = color;
+            }
         }
         
     }

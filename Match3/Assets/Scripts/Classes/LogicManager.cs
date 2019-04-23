@@ -32,6 +32,7 @@ namespace Match3Project.Classes
         private IDictionary<Vector3, PowerUpTypes> _spawnedPowerUpDictionary;
         private IDictionary<IList<ICell>, AxisTypes> _matchedCellsDictionary;
         private IDictionary<ICell, IDictionary<IList<ICell>, AxisTypes>> _matchedCellsWithAxisDictionary;
+        private IList<Color> _colorsList;
 
         private ICell _lastFallCell;
         private bool _lastSpawnedCell;
@@ -46,7 +47,8 @@ namespace Match3Project.Classes
             _spawnedPowerUpDictionary = new Dictionary<Vector3, PowerUpTypes>();
             _matchedCellsDictionary = new Dictionary<IList<ICell>, AxisTypes>();
             _matchedCellsWithAxisDictionary = new Dictionary<ICell, IDictionary<IList<ICell>, AxisTypes>>();
-
+            _colorsList = new List<Color>();
+            
             _gameState = GameStates.Ready;
             _reverseGravity = false;
         }
@@ -264,6 +266,10 @@ namespace Match3Project.Classes
                         {
                             AxisTypes majorAxis = cellList.Value;
                             int matchCount = cellList.Key.Count;
+                            
+                            SpriteRenderer render =
+                                cellList.Key.First().CurrentGameObject.GetComponent<SpriteRenderer>();
+                            _colorsList.Add(render.color);
 
                             PowerUpTypes powerUp = Helper.DetectPowerUp(matchCount, majorAxis);
                             _spawnedPowerUpDictionary.Add(
@@ -286,17 +292,24 @@ namespace Match3Project.Classes
         {
             if (_spawnedPowerUpDictionary.Count > 0)
             {
+                int i = 0;
                 foreach (var spawnedPowerUp in _spawnedPowerUpDictionary)
                 {
                     GameObject spawnedPowerUpGO =
                         _spawnManager.SpawnPowerPrefab(spawnedPowerUp.Value, spawnedPowerUp.Key);
+
+                    Helper.SetGravityPowerUpColor(spawnedPowerUpGO, _colorsList[i]);
+                    
                     _board.Cells[(int) spawnedPowerUp.Key.x, (int) spawnedPowerUp.Key.y].CurrentGameObject =
                         spawnedPowerUpGO;
+                    
+                    i++;
                 }
             }
 
             _spawnedPowerUpDictionary.Clear();
-
+            _colorsList.Clear();
+            
             DecreaseBoard();
 
             yield return new WaitForSeconds(StringsAndConst.TIME_AFTER_DECREASE);
@@ -406,6 +419,7 @@ namespace Match3Project.Classes
                 for (int i = _board.Width - 1; i >= 0; i--)
                 {
                     for (int j = _board.Height - 1; j >= 0; j--)
+                    {
                         if (_board.Cells[i, j].CurrentGameObject == null)
                         {
                             for (int k = j - 1; k >= 0; k--)
@@ -417,6 +431,7 @@ namespace Match3Project.Classes
                                 }
                             }
                         }
+                    }
                 }
             }
             else
@@ -424,6 +439,7 @@ namespace Match3Project.Classes
                 for (int i = 0; i < _board.Width; i++)
                 {
                     for (int j = 0; j < _board.Height; j++)
+                    {
                         if (_board.Cells[i, j].CurrentGameObject == null)
                         {
                             for (int k = j + 1; k < _board.Height; k++)
@@ -434,7 +450,8 @@ namespace Match3Project.Classes
                                     break;
                                 }
                             }
-                        }
+                        }  
+                    }
                 }
             }
 

@@ -28,6 +28,5 @@ namespace Match3Project.Classes
             normalCell.Notifier = _notifier;
             _updateManager.AddUpdatable(normalCell);
         }
-
     }
 }

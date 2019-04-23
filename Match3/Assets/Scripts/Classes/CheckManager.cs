@@ -91,19 +91,6 @@ namespace Match3Project.Classes
             return sideCells;
         }
 
-        public bool HaveMatch(ICell cell)
-        {
-            IList<ICell> horizontalCellsList = CheckLine(AxisTypes.Horizontal, cell);
-            IList<ICell> verticalCellsList = CheckLine(AxisTypes.Vertical, cell);
-
-            if (horizontalCellsList.Count > 1 || verticalCellsList.Count > 1)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public IList<ICell> CheckCell(ICell cell, out AxisTypes majorAxis)
         {
             IList<ICell> allCellList = new List<ICell>();
@@ -156,7 +143,18 @@ namespace Match3Project.Classes
             return allCellList;
         }
 
-        #region Powers
+        public bool HaveMatch(ICell cell)
+        {
+            IList<ICell> horizontalCellsList = CheckLine(AxisTypes.Horizontal, cell);
+            IList<ICell> verticalCellsList = CheckLine(AxisTypes.Vertical, cell);
+
+            if (horizontalCellsList.Count > 1 || verticalCellsList.Count > 1)
+            {
+                return true;
+            }
+
+            return false;
+        }
 
         public IList<ICell> PowerCheck(PowerUpTypes powerUpType, Vector2 position)
         {
@@ -168,7 +166,7 @@ namespace Match3Project.Classes
             switch (powerUpType)
             {
                 case PowerUpTypes.Gravity:
-                    checkedCells = GravityPower(posX, posY);
+                    checkedCells.Add(_board.Cells[posX, posY]);
                     break;
 
                 default:
@@ -178,38 +176,6 @@ namespace Match3Project.Classes
 
             return checkedCells;
         }
-
-        private IList<ICell> GravityPower(int posX, int posY)
-        {
-            IList<ICell> checkedCells = new List<ICell>();
-
-            foreach (var cell in _board.Cells)
-            {
-                int x = Mathf.Abs(cell.TargetX - posX);
-                int y = Mathf.Abs(cell.TargetY - posY);
-
-                if (x < 3 && x > 0 && y < 2)
-                {
-                    checkedCells.Add(cell);
-                }
-                else if (y < 3 && y > 0 && x < 2)
-                {
-                    checkedCells.Add(cell);
-                }
-                else if (x == 1 && y == 1 || x == 1 && y == 0 || x == 0 && y == 1)
-                {
-                    checkedCells.Add(cell);
-                }
-                else if (x == 0 && y == 0)
-                {
-                    checkedCells.Add(cell);
-                }
-            }
-
-            return checkedCells;
-        }
-
-        #endregion
 
         public IBoard Board
         {

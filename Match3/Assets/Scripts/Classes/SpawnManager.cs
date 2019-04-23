@@ -40,6 +40,7 @@ namespace Match3Project.Classes
             
             _objectSetter.SetGameObject(newGameObject, position);
             _objectSetter.SetNormalCell(newNormalCell as INormalCell, newGameObject);
+            
             return newNormalCell;
         }
         
