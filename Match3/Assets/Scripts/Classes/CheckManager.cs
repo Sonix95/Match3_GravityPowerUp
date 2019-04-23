@@ -46,12 +46,25 @@ namespace Match3Project.Classes
                         ? _board.Cells[i, y]
                         : _board.Cells[x, i];
 
-                    if (Helper.CellIsEmpty(sideCell) ||
-                        sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                    if (Helper.CellIsEmpty(sideCell))
                     {
                         break;
                     }
 
+                    if (sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                    {
+                        GameObject powerGameObject = sideCell.CurrentGameObject.transform.GetChild(0).transform.gameObject;
+                        
+                        if (Helper.CompareColors(cell.CurrentGameObject, powerGameObject))
+                        {
+                            sideCells.Add(sideCell);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
                     if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
                     {
                         sideCells.Add(sideCell);
@@ -71,12 +84,25 @@ namespace Match3Project.Classes
                         ? _board.Cells[i, y]
                         : _board.Cells[x, i];
 
-                    if (Helper.CellIsEmpty(sideCell) ||
-                        sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                    if (Helper.CellIsEmpty(sideCell))
                     {
                         break;
                     }
 
+                    if (sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                    {
+                        GameObject powerGameObject = sideCell.CurrentGameObject.transform.GetChild(0).transform.gameObject;
+                        
+                        if (Helper.CompareColors(cell.CurrentGameObject, powerGameObject))
+                        {
+                            sideCells.Add(sideCell);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
                     if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
                     {
                         sideCells.Add(sideCell);
@@ -166,7 +192,7 @@ namespace Match3Project.Classes
             switch (powerUpType)
             {
                 case PowerUpTypes.Gravity:
-                    checkedCells.Add(_board.Cells[posX, posY]);
+                    //checkedCells.Add(_board.Cells[posX, posY]);
                     break;
 
                 default:

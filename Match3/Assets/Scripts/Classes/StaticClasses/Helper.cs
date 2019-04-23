@@ -66,6 +66,19 @@ namespace Match3Project.Classes.StaticClasses
                 render.color = color;
             }
         }
-        
+
+        public static bool CompareColors(GameObject cellA, GameObject cellB)
+        {
+            SpriteRenderer  renderA = cellA.GetComponent<SpriteRenderer>();
+            SpriteRenderer  renderB = cellB.GetComponent<SpriteRenderer>();
+
+            if (renderA == null || renderB == null)
+            {
+                return false;
+            }
+            
+            return renderA.color == renderB.color;
+        }
+
     }
 }

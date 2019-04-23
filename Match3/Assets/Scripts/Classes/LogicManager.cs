@@ -37,6 +37,7 @@ namespace Match3Project.Classes
         private ICell _lastFallCell;
         private bool _lastSpawnedCell;
 
+        private bool _gravityUsed = false;
         private bool _reverseGravity;
         private int _spawnYPos;
 
@@ -114,9 +115,7 @@ namespace Match3Project.Classes
                     Vector3 position = (Vector3) arr[1];
 
                     _powersDictionary.Add(position, powerUp);
-
-                    _reverseGravity = !_reverseGravity;
-                    _spawnYPos = _reverseGravity ? -1 : _board.Height;
+                    
                     break;
 
                 case EventTypes.BOARD_Collapse:
@@ -128,13 +127,27 @@ namespace Match3Project.Classes
                     {
                         Vector2 pos = _powersDictionary.First().Key;
                         PowerUpTypes powerUpType = _powersDictionary.First().Value;
-
+                        
+                        if (powerUpType == PowerUpTypes.Gravity)
+                        {
+                            if (_gravityUsed == false)
+                            {
+                                _reverseGravity = !_reverseGravity;
+                                _gravityUsed = true;
+                                //_spawnYPos = _reverseGravity ? -1 : _board.Height;
+                            }
+                            else
+                            {
+                                Debug.Log("Already used gravity");
+                            }
+                        }
+                        
                         List<ICell> cellsList = new List<ICell>(_checkManager.PowerCheck(powerUpType, pos));
                         ICell cell = _board.Cells[(int) pos.x, (int) pos.y];
-
+                        
                         _matchedCellsDictionary.Add(cellsList, AxisTypes.Undefined);
                         _matchedCellsWithAxisDictionary.Add(cell, _matchedCellsDictionary);
-
+                        
                         _powersDictionary.Remove(_powersDictionary.First());
 
                         StartCoroutine(DestroyMatchedCells(_matchedCellsWithAxisDictionary));
@@ -151,7 +164,7 @@ namespace Match3Project.Classes
                     break;
             }
         }
-
+        
         private void TryCheckSwipedCells(ICell cell)
         {
             _swipeCounter++;
@@ -180,8 +193,8 @@ namespace Match3Project.Classes
                 }
                 else
                 {
-                    _matchedCellsWithAxisDictionary.Clear();
-                    _matchedCellsDictionary.Clear();
+                   _matchedCellsWithAxisDictionary.Clear();
+                   _matchedCellsDictionary.Clear();
 
                     UndoMacroCommand();
                 }
@@ -194,11 +207,11 @@ namespace Match3Project.Classes
         private void CheckBoard()
         {
             _lastSpawnedCell = false;
-
+            
             _fallCellsDictionary.Clear();
-            _matchedCellsDictionary.Clear();
             _matchedCellsWithAxisDictionary.Clear();
-
+            _matchedCellsDictionary.Clear();
+            
             if (HaveMatches())
             {
                 FindMatches();
@@ -261,15 +274,26 @@ namespace Match3Project.Classes
                 {
                     if (cellDictionary.Key.CurrentGameObject != null)
                     {
-                        if (cellList.Key.Count > 3 &&
-                            cellDictionary.Key.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER) == false)
+                        if (cellList.Key.Count > 3)
                         {
                             AxisTypes majorAxis = cellList.Value;
                             int matchCount = cellList.Key.Count;
+
+                            SpriteRenderer render = null;
                             
-                            SpriteRenderer render =
-                                cellList.Key.First().CurrentGameObject.GetComponent<SpriteRenderer>();
-                            _colorsList.Add(render.color);
+                            if (cellDictionary.Key.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+                            {
+                                GameObject go = cellDictionary.Key.CurrentGameObject.transform.GetChild(0).transform
+                                    .gameObject;
+
+                                render = go.GetComponent<SpriteRenderer>();
+                            }
+                            else
+                            {
+                                render = cellDictionary.Key.CurrentGameObject.GetComponent<SpriteRenderer>();
+                            }
+                            
+                           _colorsList.Add(render.color);
 
                             PowerUpTypes powerUp = Helper.DetectPowerUp(matchCount, majorAxis);
                             _spawnedPowerUpDictionary.Add(
@@ -280,11 +304,12 @@ namespace Match3Project.Classes
                     WorkAfterMatch(cellList.Key);
                 }
             }
-
+            
             _matchedCellsWithAxisDictionary.Clear();
             _matchedCellsDictionary.Clear();
 
             yield return new WaitForSeconds(StringsAndConst.TIME_AFTER_DESTROY);
+            
             OnEvent(EventTypes.BOARD_EndDestroyMatchedCells, null);
         }
 
@@ -306,13 +331,16 @@ namespace Match3Project.Classes
                     i++;
                 }
             }
-
+            
             _spawnedPowerUpDictionary.Clear();
             _colorsList.Clear();
             
             DecreaseBoard();
 
             yield return new WaitForSeconds(StringsAndConst.TIME_AFTER_DECREASE);
+            
+            _gravityUsed = false;
+            
             SpawnNewCells();
         }
 
@@ -340,6 +368,8 @@ namespace Match3Project.Classes
 
             if (_reverseGravity)
             {
+                _spawnYPos = -1;
+                
                 for (int i = _board.Height; i >= 0; i--)
                 {
                     List<Vector2> tempList = new List<Vector2>();
@@ -357,6 +387,7 @@ namespace Match3Project.Classes
             }
             else
             {
+                _spawnYPos = _board.Height;
                 for (int i = 0; i < _board.Height; i++)
                 {
                     List<Vector2> tempList = new List<Vector2>();
@@ -384,7 +415,7 @@ namespace Match3Project.Classes
                 if (row.Value.Count > 0)
                 {
                     SpawnRow(row.Value);
-                    yield return new WaitForSeconds(.3f);
+                    yield return new WaitForSeconds(.2f);
                 }
             }
         }

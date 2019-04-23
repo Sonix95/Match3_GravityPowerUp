@@ -4,11 +4,11 @@ namespace Match3Project.Classes.StaticClasses
     {
         public const float SWIPE_SENSITIVITY = 0.1f;
 
-        public const float POSITION_DELTA = 0.1f;
+        public const float POSITION_DELTA = 0.15f;
         public const float CELL_SPEED = 9.81f;
         
-        public const float TIME_AFTER_DESTROY = 0.02f;
-        public const float TIME_AFTER_DECREASE = 0.02f;
+        public const float TIME_AFTER_DESTROY = 0.6f;
+        public const float TIME_AFTER_DECREASE = 0.7f;
 
         public const string UPDATE_MANAGER = "Update Manager";
         public const string LOGIC_MANAGER = "Logic Manager";

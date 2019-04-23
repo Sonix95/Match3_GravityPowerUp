@@ -33,28 +33,31 @@ namespace Match3Project.Classes.Cells
         {
             Vector2 tempPos = new Vector2(_x, _y);
 
-            if (Mathf.Abs(_x - _currentGameObject.transform.position.x) > StringsAndConst.POSITION_DELTA ||
-                Mathf.Abs(_y - _currentGameObject.transform.position.y) > StringsAndConst.POSITION_DELTA)
+            if (_currentGameObject != null)
             {
-                _currentGameObject.transform.position = Vector2.Lerp(_currentGameObject.transform.position, tempPos,
-                    StringsAndConst.CELL_SPEED * Time.deltaTime);
-            }
-            else
-            {
-                _currentGameObject.transform.position = tempPos;
-                _canUpdate = false;
-
-                switch (CellState)
+                if (Mathf.Abs(_x - _currentGameObject.transform.position.x) > StringsAndConst.POSITION_DELTA ||
+                    Mathf.Abs(_y - _currentGameObject.transform.position.y) > StringsAndConst.POSITION_DELTA)
                 {
-                    case CellStates.Swipe:
-                        _notifier.Notify(EventTypes.CELL_EndMove, this);
-                        break;
-                    case CellStates.Back:
-                        _notifier.Notify(EventTypes.CELL_EndMoveBack, this);
-                        break;
-                    case CellStates.Fall:
-                        _notifier.Notify(EventTypes.CELL_Fall, this);
-                        break;
+                    _currentGameObject.transform.position = Vector2.Lerp(_currentGameObject.transform.position, tempPos,
+                        StringsAndConst.CELL_SPEED * Time.deltaTime);
+                }
+                else
+                {
+                    _currentGameObject.transform.position = tempPos;
+                    _canUpdate = false;
+
+                    switch (CellState)
+                    {
+                        case CellStates.Swipe:
+                            _notifier.Notify(EventTypes.CELL_EndMove, this);
+                            break;
+                        case CellStates.Back:
+                            _notifier.Notify(EventTypes.CELL_EndMoveBack, this);
+                            break;
+                        case CellStates.Fall:
+                            _notifier.Notify(EventTypes.CELL_Fall, this);
+                            break;
+                    }
                 }
             }
         }
