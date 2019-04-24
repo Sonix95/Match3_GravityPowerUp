@@ -53,7 +53,7 @@ namespace Match3Project.Classes
 
                     if (sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
                     {
-                        GameObject powerGameObject = sideCell.CurrentGameObject.transform.GetChild(0).transform.gameObject;
+                        GameObject powerGameObject = sideCell.CurrentGameObject.transform.GetChild(0).gameObject;
                         
                         if (Helper.CompareColors(cell.CurrentGameObject, powerGameObject))
                         {
@@ -91,10 +91,10 @@ namespace Match3Project.Classes
 
                     if (sideCell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
                     {
-                        GameObject powerGameObject = sideCell.CurrentGameObject.transform.GetChild(0).transform.gameObject;
+                        GameObject powerGameObject = sideCell.CurrentGameObject.transform.GetChild(0).gameObject;
                         
                         if (Helper.CompareColors(cell.CurrentGameObject, powerGameObject))
-                        {
+                        { 
                             sideCells.Add(sideCell);
                         }
                         else

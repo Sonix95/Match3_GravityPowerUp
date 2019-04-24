@@ -67,16 +67,54 @@ namespace Match3Project.Classes.StaticClasses
             }
         }
 
+        public static Color DetectColor(ICell cell)
+        {
+            SpriteRenderer render = null;
+                            
+            if (cell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
+            {
+                GameObject go = cell.CurrentGameObject.transform.GetChild(0).transform
+                    .gameObject;
+
+                render = go.GetComponent<SpriteRenderer>();
+            }
+            else
+            {
+                render = cell.CurrentGameObject.GetComponent<SpriteRenderer>();
+            }
+
+            return render.color;
+        }
+        
         public static bool CompareColors(GameObject cellA, GameObject cellB)
         {
-            SpriteRenderer  renderA = cellA.GetComponent<SpriteRenderer>();
-            SpriteRenderer  renderB = cellB.GetComponent<SpriteRenderer>();
+            SpriteRenderer renderA = null;
+            SpriteRenderer renderB = null;
+            
+            if (cellA.CompareTag("Power") || cellB.CompareTag("Power"))
+            {
+                if (cellA.CompareTag("Power"))
+                {
+                    GameObject goA = cellA.transform.GetChild(0).gameObject;
+                    renderA = goA.GetComponent<SpriteRenderer>();
+                }
+                else
+                {
+                    GameObject goB = cellB.transform.GetChild(0).gameObject;
+                    renderB = goB.GetComponent<SpriteRenderer>();
+                }
+            }
+            else 
+            {
+                renderA = cellA.GetComponent<SpriteRenderer>();
+                renderB = cellB.GetComponent<SpriteRenderer>();
+            }
 
             if (renderA == null || renderB == null)
             {
                 return false;
             }
-            
+
             return renderA.color == renderB.color;
         }
 

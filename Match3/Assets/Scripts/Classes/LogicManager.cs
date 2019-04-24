@@ -37,9 +37,9 @@ namespace Match3Project.Classes
         private ICell _lastFallCell;
         private bool _lastSpawnedCell;
 
-        private bool _gravityUsed = false;
         private bool _reverseGravity;
         private int _spawnYPos;
+        private bool _hasPowerUps;
 
         private void Awake()
         {
@@ -52,6 +52,7 @@ namespace Match3Project.Classes
             
             _gameState = GameStates.Ready;
             _reverseGravity = false;
+            _hasPowerUps = false;
         }
 
         public void OnEvent(EventTypes eventType, object messageData)
@@ -123,33 +124,39 @@ namespace Match3Project.Classes
                     break;
 
                 case EventTypes.BOARD_EndDestroyMatchedCells:
+                    
                     if (_powersDictionary.Count > 0)
+                        _hasPowerUps = true;
+
+                    if (_hasPowerUps)
                     {
-                        Vector2 pos = _powersDictionary.First().Key;
-                        PowerUpTypes powerUpType = _powersDictionary.First().Value;
-                        
-                        if (powerUpType == PowerUpTypes.Gravity)
+                        foreach (var power in _powersDictionary)
                         {
-                            if (_gravityUsed == false)
+                            Vector2 pos = power.Key;
+                            PowerUpTypes powerUpType = power.Value;
+
+                            if (powerUpType == PowerUpTypes.Gravity)
                             {
                                 _reverseGravity = !_reverseGravity;
-                                _gravityUsed = true;
-                                //_spawnYPos = _reverseGravity ? -1 : _board.Height;
                             }
-                            else
+                            
+                            List<ICell> cellsList = new List<ICell>(_checkManager.PowerCheck(powerUpType, pos));
+                            ICell cell = _board.Cells[(int) pos.x, (int) pos.y];
+
+                            if (_matchedCellsDictionary.ContainsKey(cellsList) == false)
                             {
-                                Debug.Log("Already used gravity");
+                                _matchedCellsDictionary.Add(cellsList, AxisTypes.Undefined);
+                            }
+                            
+                            if (_matchedCellsWithAxisDictionary.ContainsKey(cell) == false)
+                            {
+                                _matchedCellsWithAxisDictionary.Add(cell, _matchedCellsDictionary);
                             }
                         }
                         
-                        List<ICell> cellsList = new List<ICell>(_checkManager.PowerCheck(powerUpType, pos));
-                        ICell cell = _board.Cells[(int) pos.x, (int) pos.y];
+                        _powersDictionary.Clear();
+                        _hasPowerUps = false;
                         
-                        _matchedCellsDictionary.Add(cellsList, AxisTypes.Undefined);
-                        _matchedCellsWithAxisDictionary.Add(cell, _matchedCellsDictionary);
-                        
-                        _powersDictionary.Remove(_powersDictionary.First());
-
                         StartCoroutine(DestroyMatchedCells(_matchedCellsWithAxisDictionary));
                     }
                     else
@@ -164,7 +171,6 @@ namespace Match3Project.Classes
                     break;
             }
         }
-        
         private void TryCheckSwipedCells(ICell cell)
         {
             _swipeCounter++;
@@ -209,8 +215,6 @@ namespace Match3Project.Classes
             _lastSpawnedCell = false;
             
             _fallCellsDictionary.Clear();
-            _matchedCellsWithAxisDictionary.Clear();
-            _matchedCellsDictionary.Clear();
             
             if (HaveMatches())
             {
@@ -279,21 +283,7 @@ namespace Match3Project.Classes
                             AxisTypes majorAxis = cellList.Value;
                             int matchCount = cellList.Key.Count;
 
-                            SpriteRenderer render = null;
-                            
-                            if (cellDictionary.Key.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
-                            {
-                                GameObject go = cellDictionary.Key.CurrentGameObject.transform.GetChild(0).transform
-                                    .gameObject;
-
-                                render = go.GetComponent<SpriteRenderer>();
-                            }
-                            else
-                            {
-                                render = cellDictionary.Key.CurrentGameObject.GetComponent<SpriteRenderer>();
-                            }
-                            
-                           _colorsList.Add(render.color);
+                            _colorsList.Add(Helper.DetectColor(cellDictionary.Key));
 
                             PowerUpTypes powerUp = Helper.DetectPowerUp(matchCount, majorAxis);
                             _spawnedPowerUpDictionary.Add(
@@ -304,7 +294,7 @@ namespace Match3Project.Classes
                     WorkAfterMatch(cellList.Key);
                 }
             }
-            
+
             _matchedCellsWithAxisDictionary.Clear();
             _matchedCellsDictionary.Clear();
 
@@ -338,8 +328,6 @@ namespace Match3Project.Classes
             DecreaseBoard();
 
             yield return new WaitForSeconds(StringsAndConst.TIME_AFTER_DECREASE);
-            
-            _gravityUsed = false;
             
             SpawnNewCells();
         }
@@ -415,7 +403,7 @@ namespace Match3Project.Classes
                 if (row.Value.Count > 0)
                 {
                     SpawnRow(row.Value);
-                    yield return new WaitForSeconds(.2f);
+                    yield return new WaitForSeconds(StringsAndConst.TIME_BETWEEN_SPAWN);
                 }
             }
         }
@@ -489,7 +477,7 @@ namespace Match3Project.Classes
             StartFall(_fallCellsDictionary);
         }
 
-        public void SetNewFallTarget(int i, int j, int k)
+        private void SetNewFallTarget(int i, int j, int k)
         {
             GameObject go = _board.Cells[i, k].CurrentGameObject;
             _fallCellsDictionary.Add(go, new Vector2(i, j));
