@@ -6,14 +6,10 @@ TagManager:
   tags:
   - Power
   - Gravity
-  - White
-  - Green
-  - Yellow
-  - Purple
-  - Orange
-  - Red
   - Blue
-  - Brown
+  - Green
+  - Purple
+  - Yellow
   layers:
   - Default
   - TransparentFX

@@ -59,10 +59,6 @@ namespace Match3Project.Classes
                         {
                             sideCells.Add(sideCell);
                         }
-                        else
-                        {
-                            break;
-                        }
                     }
                     
                     if (sideCell.CurrentGameObject.CompareTag(cell.CurrentGameObject.tag))
@@ -71,6 +67,7 @@ namespace Match3Project.Classes
                     }
                     else
                     {
+                        
                         break;
                     }
                 }
@@ -117,7 +114,7 @@ namespace Match3Project.Classes
             return sideCells;
         }
 
-        public IList<ICell> CheckCell(ICell cell, out AxisTypes majorAxis)
+        public IList<ICell> CheckCell(ICell cell)
         {
             IList<ICell> allCellList = new List<ICell>();
 
@@ -143,19 +140,6 @@ namespace Match3Project.Classes
             if (allCellList.Count > 0)
             {
                 allCellList.Add(cell);
-            }
-
-            if (horizontalCellsList.Count > verticalCellsList.Count)
-            {
-                majorAxis = AxisTypes.Horizontal;
-            }
-            else if (horizontalCellsList.Count < verticalCellsList.Count)
-            {
-                majorAxis = AxisTypes.Vertical;
-            }
-            else
-            {
-                majorAxis = AxisTypes.Undefined;
             }
 
             foreach (var oneCell in allCellList)

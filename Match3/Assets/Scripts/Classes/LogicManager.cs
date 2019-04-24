@@ -28,10 +28,12 @@ namespace Match3Project.Classes
         private int _swipeCounter;
 
         private IDictionary<GameObject, Vector2> _fallCellsDictionary;
+
         private IDictionary<Vector2, PowerUpTypes> _powersDictionary;
         private IDictionary<Vector3, PowerUpTypes> _spawnedPowerUpDictionary;
-        private IDictionary<IList<ICell>, AxisTypes> _matchedCellsDictionary;
-        private IDictionary<ICell, IDictionary<IList<ICell>, AxisTypes>> _matchedCellsWithAxisDictionary;
+
+        private IDictionary<ICell, IList<ICell>> _matchedCellsDictionary;
+
         private IList<Color> _colorsList;
 
         private ICell _lastFallCell;
@@ -44,12 +46,14 @@ namespace Match3Project.Classes
         private void Awake()
         {
             _fallCellsDictionary = new Dictionary<GameObject, Vector2>();
+
             _powersDictionary = new Dictionary<Vector2, PowerUpTypes>();
             _spawnedPowerUpDictionary = new Dictionary<Vector3, PowerUpTypes>();
-            _matchedCellsDictionary = new Dictionary<IList<ICell>, AxisTypes>();
-            _matchedCellsWithAxisDictionary = new Dictionary<ICell, IDictionary<IList<ICell>, AxisTypes>>();
+
+            _matchedCellsDictionary = new Dictionary<ICell, IList<ICell>>();
+
             _colorsList = new List<Color>();
-            
+
             _gameState = GameStates.Ready;
             _reverseGravity = false;
             _hasPowerUps = false;
@@ -116,7 +120,7 @@ namespace Match3Project.Classes
                     Vector3 position = (Vector3) arr[1];
 
                     _powersDictionary.Add(position, powerUp);
-                    
+
                     break;
 
                 case EventTypes.BOARD_Collapse:
@@ -124,7 +128,6 @@ namespace Match3Project.Classes
                     break;
 
                 case EventTypes.BOARD_EndDestroyMatchedCells:
-                    
                     if (_powersDictionary.Count > 0)
                         _hasPowerUps = true;
 
@@ -139,25 +142,20 @@ namespace Match3Project.Classes
                             {
                                 _reverseGravity = !_reverseGravity;
                             }
-                            
+
                             List<ICell> cellsList = new List<ICell>(_checkManager.PowerCheck(powerUpType, pos));
                             ICell cell = _board.Cells[(int) pos.x, (int) pos.y];
 
-                            if (_matchedCellsDictionary.ContainsKey(cellsList) == false)
+                            if (_matchedCellsDictionary.ContainsKey(cell) == false)
                             {
-                                _matchedCellsDictionary.Add(cellsList, AxisTypes.Undefined);
-                            }
-                            
-                            if (_matchedCellsWithAxisDictionary.ContainsKey(cell) == false)
-                            {
-                                _matchedCellsWithAxisDictionary.Add(cell, _matchedCellsDictionary);
+                                _matchedCellsDictionary.Add(cell, cellsList);
                             }
                         }
-                        
+
                         _powersDictionary.Clear();
                         _hasPowerUps = false;
-                        
-                        StartCoroutine(DestroyMatchedCells(_matchedCellsWithAxisDictionary));
+
+                        StartCoroutine(DestroyMatchedCells(_matchedCellsDictionary));
                     }
                     else
                     {
@@ -171,12 +169,12 @@ namespace Match3Project.Classes
                     break;
             }
         }
+
         private void TryCheckSwipedCells(ICell cell)
         {
             _swipeCounter++;
 
-            AxisTypes majorAxis;
-            IList<ICell> cellsList = new List<ICell>(_checkManager.CheckCell(cell, out majorAxis));
+            IList<ICell> cellsList = new List<ICell>(_checkManager.CheckCell(cell));
 
             if (cellsList.Count > 2 || cell.CurrentGameObject.CompareTag(StringsAndConst.TAG_POWER))
             {
@@ -185,8 +183,7 @@ namespace Match3Project.Classes
                     cellsList.Add(cell);
                 }
 
-                _matchedCellsDictionary.Add(cellsList, majorAxis);
-                _matchedCellsWithAxisDictionary.Add(cell, _matchedCellsDictionary);
+                _matchedCellsDictionary.Add(cell, cellsList);
 
                 _isMatchedSwipe = true;
             }
@@ -195,12 +192,11 @@ namespace Match3Project.Classes
             {
                 if (_isMatchedSwipe)
                 {
-                    StartCoroutine(DestroyMatchedCells(_matchedCellsWithAxisDictionary));
+                    StartCoroutine(DestroyMatchedCells(_matchedCellsDictionary));
                 }
                 else
                 {
-                   _matchedCellsWithAxisDictionary.Clear();
-                   _matchedCellsDictionary.Clear();
+                    _matchedCellsDictionary.Clear();
 
                     UndoMacroCommand();
                 }
@@ -213,35 +209,16 @@ namespace Match3Project.Classes
         private void CheckBoard()
         {
             _lastSpawnedCell = false;
-            
+
             _fallCellsDictionary.Clear();
-            
-            if (HaveMatches())
+
+            if (Helper.HaveMatches(_checkManager))
             {
                 FindMatches();
                 return;
             }
 
             _gameState = GameStates.Ready;
-        }
-
-        private bool HaveMatches()
-        {
-            for (int i = 0; i < _board.Width; i++)
-            {
-                for (int j = 0; j < _board.Height; j++)
-                {
-                    if (Helper.CellIsEmpty(_board.Cells[i, j]) == false)
-                    {
-                        if (_checkManager.HaveMatch(_board.Cells[i, j]))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         public void FindMatches()
@@ -252,55 +229,53 @@ namespace Match3Project.Classes
 
                 IList<ICell> matchedCellsList = new List<ICell>();
 
-                IDictionary<IList<ICell>, AxisTypes> matchedCellsDictionary =
-                    new Dictionary<IList<ICell>, AxisTypes>();
-
                 if (Helper.CellIsEmpty(cell) == false)
                 {
                     if (cell.CellState != CellStates.Check)
                     {
-                        matchedCellsList = _checkManager.CheckCell(cell, out majorAxis);
-                        matchedCellsDictionary.Add(matchedCellsList, majorAxis);
-                        _matchedCellsWithAxisDictionary.Add(cell, matchedCellsDictionary);
+                        matchedCellsList = _checkManager.CheckCell(cell);
+                        _matchedCellsDictionary.Add(cell, matchedCellsList);
                     }
                 }
             }
 
-            StartCoroutine(DestroyMatchedCells(_matchedCellsWithAxisDictionary));
+            StartCoroutine(DestroyMatchedCells(_matchedCellsDictionary));
         }
 
-        private IEnumerator DestroyMatchedCells(
-            IDictionary<ICell, IDictionary<IList<ICell>, AxisTypes>> cellsWithAxisDictionary)
+        private IEnumerator DestroyMatchedCells(IDictionary<ICell, IList<ICell>> matchedCellsDictionary)
         {
-            foreach (var cellDictionary in cellsWithAxisDictionary)
+            foreach (var cellList in matchedCellsDictionary)
             {
-                foreach (var cellList in cellDictionary.Value)
+                if (cellList.Key.CurrentGameObject != null)
                 {
-                    if (cellDictionary.Key.CurrentGameObject != null)
+                    if (cellList.Value.Count > 3)
                     {
-                        if (cellList.Key.Count > 3)
-                        {
-                            AxisTypes majorAxis = cellList.Value;
-                            int matchCount = cellList.Key.Count;
+                        int matchCount = cellList.Value.Count;
 
-                            _colorsList.Add(Helper.DetectColor(cellDictionary.Key));
+                        _colorsList.Add(Helper.DetectColor(cellList.Key));
 
-                            PowerUpTypes powerUp = Helper.DetectPowerUp(matchCount, majorAxis);
-                            _spawnedPowerUpDictionary.Add(
-                                new Vector3(cellDictionary.Key.TargetX, cellDictionary.Key.TargetY, 0f), powerUp);
-                        }
+                        PowerUpTypes powerUp = Helper.DetectPowerUp(matchCount);
+                        _spawnedPowerUpDictionary.Add(
+                            new Vector3(cellList.Key.TargetX, cellList.Key.TargetY, 0f), powerUp);
                     }
-
-                    WorkAfterMatch(cellList.Key);
                 }
+
+                WorkAfterMatch(cellList.Value);
             }
 
-            _matchedCellsWithAxisDictionary.Clear();
             _matchedCellsDictionary.Clear();
 
             yield return new WaitForSeconds(StringsAndConst.TIME_AFTER_DESTROY);
-            
+
             OnEvent(EventTypes.BOARD_EndDestroyMatchedCells, null);
+        }
+        
+        private void WorkAfterMatch(IList<ICell> cellsAfterMarkList)
+        {
+            foreach (var cell in cellsAfterMarkList)
+            {
+                cell.DoAfterMatch();
+            }
         }
 
         private IEnumerator RefillBoard()
@@ -314,21 +289,21 @@ namespace Match3Project.Classes
                         _spawnManager.SpawnPowerPrefab(spawnedPowerUp.Value, spawnedPowerUp.Key);
 
                     Helper.SetGravityPowerUpColor(spawnedPowerUpGO, _colorsList[i]);
-                    
+
                     _board.Cells[(int) spawnedPowerUp.Key.x, (int) spawnedPowerUp.Key.y].CurrentGameObject =
                         spawnedPowerUpGO;
-                    
+
                     i++;
                 }
             }
-            
+
             _spawnedPowerUpDictionary.Clear();
             _colorsList.Clear();
-            
+
             DecreaseBoard();
 
             yield return new WaitForSeconds(StringsAndConst.TIME_AFTER_DECREASE);
-            
+
             SpawnNewCells();
         }
 
@@ -357,7 +332,7 @@ namespace Match3Project.Classes
             if (_reverseGravity)
             {
                 _spawnYPos = -1;
-                
+
                 for (int i = _board.Height; i >= 0; i--)
                 {
                     List<Vector2> tempList = new List<Vector2>();
@@ -469,7 +444,7 @@ namespace Match3Project.Classes
                                     break;
                                 }
                             }
-                        }  
+                        }
                     }
                 }
             }
@@ -512,15 +487,7 @@ namespace Match3Project.Classes
             SetMacroCommand(commands);
             OnEvent(EventTypes.BOARD_Collapse, null);
         }
-
-        private void WorkAfterMatch(IList<ICell> cellsAfterMarkList)
-        {
-            foreach (var cell in cellsAfterMarkList)
-            {
-                cell.DoAfterMatch();
-            }
-        }
-
+        
         private void SwipeCells(MoveDirectionTypes direction)
         {
             int xPos = (int) Mathf.Round(_clickA.x);

@@ -1,4 +1,5 @@
 using Match3Project.Enums;
+using Match3Project.Interfaces;
 using Match3Project.Interfaces.Cells;
 using UnityEngine;
 
@@ -46,7 +47,7 @@ namespace Match3Project.Classes.StaticClasses
             return powerUpType;
         }
         
-        public static PowerUpTypes DetectPowerUp(int matchCount, AxisTypes axis)
+        public static PowerUpTypes DetectPowerUp(int matchCount)
         {
             PowerUpTypes powerUp = PowerUpTypes.None;
 
@@ -60,7 +61,7 @@ namespace Match3Project.Classes.StaticClasses
         {
             GameObject powerGameObject = go.transform.GetChild(0).transform.gameObject;
             
-            if (powerGameObject.CompareTag("Gravity"))
+            if (powerGameObject.CompareTag(StringsAndConst.TAG_GRAVITY))
             {
                 SpriteRenderer render = powerGameObject.GetComponent<SpriteRenderer>();
                 render.color = color;
@@ -91,9 +92,9 @@ namespace Match3Project.Classes.StaticClasses
             SpriteRenderer renderA = null;
             SpriteRenderer renderB = null;
             
-            if (cellA.CompareTag("Power") || cellB.CompareTag("Power"))
+            if (cellA.CompareTag(StringsAndConst.TAG_POWER) || cellB.CompareTag(StringsAndConst.TAG_POWER))
             {
-                if (cellA.CompareTag("Power"))
+                if (cellA.CompareTag(StringsAndConst.TAG_POWER))
                 {
                     GameObject goA = cellA.transform.GetChild(0).gameObject;
                     renderA = goA.GetComponent<SpriteRenderer>();
@@ -116,6 +117,25 @@ namespace Match3Project.Classes.StaticClasses
             }
 
             return renderA.color == renderB.color;
+        }
+        
+        public static bool HaveMatches(ICheckManager checkManager)
+        {
+            for (int i = 0; i < checkManager.Board.Width; i++)
+            {
+                for (int j = 0; j <  checkManager.Board.Height; j++)
+                {
+                    if (CellIsEmpty(checkManager.Board.Cells[i, j]) == false)
+                    {
+                        if (checkManager.HaveMatch( checkManager.Board.Cells[i, j]))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
     }

@@ -10,7 +10,7 @@ namespace Match3Project.Interfaces
         IBoard Board { get; set; }
 
         bool HaveMatch(ICell cell);
-        IList<ICell> CheckCell(ICell cell, out AxisTypes majorAxis);
+        IList<ICell> CheckCell(ICell cell);
         IList<ICell> PowerCheck(PowerUpTypes powerUpType, Vector2 position);
 
     }
